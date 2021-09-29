@@ -1,0 +1,9 @@
+version: "2.0"
+
+rules:
+
+- rule: despedirse siempre que el usuario se despida
+  steps:
+  - intent: despedir
+  - action: utter_despedir
+

@@ -1,0 +1,105 @@
+version: "2.0"
+
+intents:
+  - saludar
+  - despedir
+  - presentar
+  - identificar
+  - faltar
+  - justificar
+  - horario
+  - horas
+  - quejar
+  - nombrar
+  - motivo
+  - pedir
+  - especificar
+  - cantidad
+
+
+entities:
+  - nombre
+  - documento
+  - inicio
+  - fin
+  - companero
+  - tarea
+  - dias
+
+slots:
+  nombre:
+    type: text
+    influence_conversation: false
+  
+  documento:
+    type: text
+    influence_conversation: false
+
+  inicio:
+    type: text
+    influence_conversation: false
+  
+  fin:
+    type: text
+    influence_conversation: false
+
+  companero:
+    type: text
+    influence_conversation: false
+
+  tarea:
+    type: text
+    influence_conversation: false
+
+  dias:
+    type: text
+    influence_conversation: false
+
+responses:
+  utter_saludar:
+  - text: "Hola! Con quien estoy hablando?"
+
+  utter_despedir:
+  - text: "Adios! Nos vemos pronto!" #podemos tener una accion que cambie el mensaje segun el momento del dia
+                                    #saludar con el nombre 
+
+  utter_presentar:
+  - text: "Hola {nombre}! Antes de empezar, me podrias decir tu ID de FRV S.A."
+
+  utter_identificar:
+  - text: "Buenisimo, en que te puedo ayudar?"
+
+  utter_faltar:
+  - text: "Entiendo, por que estaras ausente hoy?"
+
+  utter_horario:
+  - text: "Entendido, que horario seria conveniente para vos?"
+
+  utter_horas:
+  - text: "Entonces queres trabahar de {inicio} a {fin}?"
+
+  utter_quejar:
+  - text: "Entiendo, sobre que companero estamos hablando?"
+
+  utter_nombrar:
+  - text: "Bueno, cual es el problema con {companero}?"
+
+  utter_pedir:
+  - text: "Perfecto, me podes decir el ID de la tarea?"
+
+  utter_especificar:
+  - text: "Ok, entonces queres pedir mas tiempo para la tarea {tarea}. Cuantos DIAS mas necesitas?"
+
+  utter_cantidad:
+  - text: "Ok, entonces {dias} dias para la tarea {tarea}."
+
+actions:
+  - action_faltar
+  - action_horarios
+  - action_queja
+  - action_dias
+  
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

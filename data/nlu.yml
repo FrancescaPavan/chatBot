@@ -1,0 +1,243 @@
+version: "2.0"
+
+nlu:
+
+- regex: documento
+  examples: |
+    - \d{8}
+
+- regex: inicio
+  examples: |
+    - \d{1,2}
+
+- regex: fin
+  examples: |
+    - \d{1,2}
+
+- regex: tarea
+  examples: |
+    - \d{3}
+
+- regex: dias
+  examples: |
+    - \d{1,2}
+
+- intent: saludar
+  examples: |
+    - hola
+    - ey
+    - buenos dias
+    - buenas tardes
+    - buen dia
+    - buenas noches
+    - buenas
+    - hello
+    - hi
+    - saludos
+
+- intent: despedir
+  examples: |
+    - adios
+    - chau
+    - hasta luego
+    - gracias
+    - nos vemos
+    - hasta pronto
+    - hasta la proxima
+    - chau chau
+    - bye
+    - goodbye
+
+- intent: presentar
+  examples: |
+    - Soy [Ana](nombre)
+    - [Manuel](nombre)
+    - Estas hablando con [Francisco](nombre)
+    - Soy [Pablo](nombre)
+    - Mi nombre es [Valentin](nombre)
+    - Yo soy [Juan](nombre)
+    - [Tomas](nombre)
+    - Soy [Lucia](nombre)
+    - Mi nombre es [Daniel](nombre)
+    - [Micaela](nombre)
+    - Soy [Rocio](nombre)
+    - Estas hablando con [Florencia](nombre)
+    - Yo soy [Catalina](nombre)
+    - Mi nombre es [Martina]
+
+- intent: identificar
+  examples: |
+    - [12345678](documento)
+    - [43256801](documento)
+    - Es [54204623](documento)
+    - Mi ID es [12564879](documento)
+    - Es [24655788](documento)
+    - [65788411](documento)
+    - Mi ID es [18966543](documento)
+
+-  intent: faltar
+   examples: |
+    - No voy a ir al trabajo
+    - Quiero avisar que no voy a ir a a trabajar
+    - Falto al trabajo
+    - No voy a la oficina
+    - Voy a estar ausente
+    - No voy a poder ir
+    - Faltare al trabajo
+    - No podre ir
+    - No voy a poder ir a la oficina
+    - Me tomo el dia
+    - Voy a faltar
+    - Aviso que no voy a trabajar
+    - Hoy no voy al trabajo
+    - Falto a la oficina
+    - No puedo asistir al trabajo hoy
+
+- intent: justificar
+  examples: |
+    - Me voy de viaje
+    - Estoy enfermo
+    - Me tomo un dia personal
+    - Por motivos personales
+    - Estoy de vacaciones
+    - Tengo que ir al medico
+    - Por paternidad
+    - Por maternidad
+    - Por motivos personales
+    - Tuve una emergencia familiar
+    - Estoy de licencia
+    - Tuve un accidente
+
+- intent: horario
+  examples: |
+    - Quiero pedir cambio de horario
+    - quiero modificar mis horarios
+    - cambiar horario
+    - quiero cambiar mi horario
+    - pedir cambio de horario
+    - cambiar mis horas de trabajo
+    - modificar mis horas
+    - quiero otro horario de trabajo
+    - quiero trabajar en otro horario
+    - tendria que modificar mi horario
+    - cambiar horas
+    - quiero otras horas
+    - pedir otras horas de trabajo
+
+- intent: horas
+  examples: |
+    - De [1](inicio) a [6](fin)
+    - Desde las [7](inicio) hasta las [14](fin)
+    - [9](inicio) a [20](fin)
+    - Arrancar a las [7](inicio) y terminar a las [14](fin)
+    - Quiero trabajar de las [12](inicio) hasta las [18](fin)
+    - [13](inicio) a [20](fin)
+    - Desde las [4](inicio) hasta las [21](fin)
+    - De [14](inicio) a [17](fin)
+    - Quiero que mis horarios sean de [8](inicio) a [15](fin)
+    - [9](inicio) a [21](fin)
+
+- intent: quejar
+  examples: |
+    - quiero hacer una queja
+    - quiero realizar una queja sobre un companero
+    - me quiero quejar de un companero de trabajo
+    - queja
+    - quejarme de un companero
+    - realizar una queja
+    - reportar un problema con un companero
+    - problema con un companero de trabajo
+    - reportar a un companero
+    - quiero reportar un problema
+    - quejarse
+    - me molesta un companero
+    - me quiero quejar
+
+- intent: nombrar
+  examples: |
+    - sobre [Francisco Garcia](companero)
+    - [Ana Perez](companero)
+    - es [Manuel Dominguez](companero)
+    - Estamos hablando de [Pablo Martinez](companero)
+    - su companero es [Valentin Perez](companero)
+    - el companero es [Juan Gonzales](companero)
+    - [Tomas Torres](companero)
+    - Sobre [Lucia Lopez](companero)
+    - Estamos hablando de [Daniel Rodriguez](companero)
+    - [Micaela Garcia](companero)
+    - es [Rocio Torres](companero)
+    - sobre [Florencia Hernandez](companero)
+    - de [Catalina Fernandez](companero)
+    - Mi problema es con [Martina Suerez](companero)
+
+- intent: motivo
+  examples: |
+    - Es irrespetuoso
+    - Me falto el respeto
+    - Llega siempre tarde
+    - Falta muy seguido
+    - No trabaja
+    - No completa sus tareas
+    - Es molesto
+    - Me insulto
+    - Se sobrepaso conmigo
+    - Me acosa
+    - Me pego
+    - Es sexista
+    - Me golpeo
+    - Fue violento hacia otros trabajadores
+    - Es agresivo
+    - Tiene actitudes inapropiadas
+    - Es violento
+    - Rompe propiedad de la empresa
+    - Roba material de la empresa
+    - Roba
+
+- intent: pedir
+  examples: |
+    - Necesito mas tiempo
+    - mas tiempo
+    - no llego al plazo
+    - quiero mas tiempo
+    - no llego a terminar mi tarea
+    - me falta tiempo
+    - quiero aplazar mi entrega
+    - necesito aplazar mi entrega
+    - necesito mas tiempo para completar mi tarea
+    - quiero solicitar mas tiempo
+    - quiero pedir mas tiempo
+    - solicitar mas tiempo
+    - pedir mas tiempo
+    - mas tiempo entregar
+
+- intent: especificar
+  examples: |
+    - [123](tarea)
+    - el ID es [145](tarea)
+    - ID [883](tarea)
+    - es la tarea [231](tarea)
+    - tarea [254](tarea)
+    - [989](tarea)
+    - la tarea con ID [346](tarea)
+    - es [238](tarea)
+    - el la [546](tarea)
+    - ID [356](tarea)
+    - tarea [900](tarea)
+    - es la tarea [438](tarea)
+    - la tarea con ID [435](tarea) 
+
+- intent: cantidad
+  examples: |
+    - necesito [2](dias)
+    - [21](dias)
+    - [12](dias) mas
+    - necesito [15](dias) mas
+    - necesito agregar [10](dias)
+    - [7](dias)
+    - necesito [13](dias)
+    - necesito [5](dias) dias
+    - [17](dias) dias mas
+    - [11](dias) dias
+    - necesito [1](dias) dias mas
+    - necesito [6](dias)
+
