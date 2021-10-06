@@ -14,9 +14,6 @@ nlu:
   examples: |
     - \d{1,2}
 
-- regex: tarea
-  examples: |
-    - \d{3}
 
 - regex: dias
   examples: |
@@ -209,22 +206,6 @@ nlu:
     - solicitar mas tiempo
     - pedir mas tiempo
     - mas tiempo entregar
-
-- intent: especificar
-  examples: |
-    - [123](tarea)
-    - el ID es [145](tarea)
-    - ID [883](tarea)
-    - es la tarea [231](tarea)
-    - tarea [254](tarea)
-    - [989](tarea)
-    - la tarea con ID [346](tarea)
-    - es [238](tarea)
-    - el la [546](tarea)
-    - ID [356](tarea)
-    - tarea [900](tarea)
-    - es la tarea [438](tarea)
-    - la tarea con ID [435](tarea) 
 
 - intent: cantidad
   examples: |

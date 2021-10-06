@@ -2,7 +2,7 @@ version: "2.0"
 
 stories:
 
-- story: saludar y presentarse
+- story: presentarse
   steps:
   - intent: saludar
   - action: utter_saludar
@@ -10,27 +10,27 @@ stories:
   - action: utter_presentar
   - intent: identificar
   - action: utter_identificar
-  - checkpoint: termino_presentacion
+  #- checkpoint: termino_presentacion
 
-- story: avisar ausencia
+- story: ausencia
   steps:
-  - checkpoint: termino_presentacion
+  #- checkpoint: termino_presentacion
   - intent: faltar
   - action: utter_faltar
   - intent: justificar
   - action: action_faltar
 
-- story: pedir cambio
+- story: cambio
   steps:
-  - checkpoint: termino_presentacion
+  #- checkpoint: termino_presentacion
   - intent: horario
   - action: utter_horario
   - intent: horas
   - action: action_horarios
 
-- story: realizar queja
+- story: queja
   steps:
-  - checkpoint: termino_presentacion
+  #- checkpoint: termino_presentacion
   - intent: quejar
   - action: utter_quejar
   - intent: nombrar
@@ -38,12 +38,10 @@ stories:
   - intent: motivo
   - action: action_queja
 
-- story: pedir mas tiempo
+- story: tiempo
   steps:
-  - checkpoint: termino_presentacion
+  #- checkpoint: termino_presentacion
   - intent: pedir
-  - action: utter_pedir
-  - intent: especificar
   - action: utter_especificar
   - intent: cantidad
   - action: action_dias

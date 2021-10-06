@@ -30,6 +30,97 @@ from rasa_sdk.executor import CollectingDispatcher
 import json
 from datetime import date
 
+
+def obtener_datos_arch(ruta):
+    a_file = open(str(ruta), "r")
+    json_object = json.load(a_file)
+    a_file.close()
+    return json_object
+
+def guardar_datos_arch(ruta, datos):
+    a_file = open(str(ruta), "w")
+    json.dump(datos, a_file)
+    a_file.close()
+
+def borrar_tarea(id):
+    datos = obtener_datos_arch("tareasEnDesarrollo.json")
+    tarea = datos[str(id)]
+
+    #desasignar la tarea completada del perfil del empleado
+    empladoID = tarea["empleado"]
+    empleados = obtener_datos_arch("employees.json")
+    empleados[str(empladoID)]["tarea"] = -1
+    guardar_datos_arch("employees.json", empleados)
+
+    #guardar la tarea completada en tareas terminadas
+    terminadas = obtener_datos_arch("tareasTerminadas.json")
+    terminadas[str(id)] = tarea
+    guardar_datos_arch("tareasTerminadas.json", terminadas)
+
+    #eliminar tarea completada de tareas en desarrollo
+    datos.pop(str(id))
+    guardar_datos_arch("tareasEnDesarrollo.json", datos)
+
+def definir_actitud(idEmpleado):
+    quejas = obtener_datos_arch("quejas.json")
+    empleados = obtener_datos_arch("employees.json")
+    #si el empleado tiene muchas quejas de otros empleados se lo clasifica como "problematico"
+    nroQuejas = 0
+    for queja in quejas:
+        if quejas[queja]["id"] == idEmpleado:
+            nroQuejas = nroQuejas + 1
+    if nroQuejas > 5:
+        return "problematico"
+    else:
+    #si el empleado tiene muchas ausencias se lo clasifica como "irresponsable"
+        cantFaltas = len(empleados[idEmpleado]["ausencias"])
+        if cantFaltas > 10:
+            return "irresponsable"
+        else:
+    #si el empleado realiza muchas quejas se lo clasifica como "quejoso"
+            if empleados[idEmpleado]["cant quejas"] > 3:
+                return "quejoso"
+            else:
+                return "normal"
+
+def asignar_tarea(empleadoID):
+    #dado un emplado buscar una tarea compatible y asignarla
+    #obtener los datos necesarios
+    tareas = obtener_datos_arch("tareas.json")
+    empleados = obtener_datos_arch("employees.json")
+    
+
+    for tarea in tareas:
+        tieneTodas = True
+        if tareas[tarea]["rango"] == empleados[empleadoID]["rango"]:
+            for habilidadReq in tareas[tarea]["habilidades necesarias"]:
+                if tieneTodas == False:
+                    break
+                for habilidadEmp in empleados[empleadoID]["habilidades"]:
+                    if habilidadReq == habilidadEmp:
+                        tieneTodas = True
+                        break
+                    else:
+                        tieneTodas = False
+            if tieneTodas == True:
+
+                empleados[empleadoID]["tarea"] = str(tarea)
+                guardar_datos_arch("employees.json", empleados)
+
+                #mover tarea a tareas en desarrollo
+                enDesarrollo = obtener_datos_arch("tareasEnDesarrollo.json")
+                enDesarrollo[tarea] = tareas[tarea]
+                enDesarrollo[tarea]["empleado"] = str(empleadoID)
+                hoy = date.today()
+                enDesarrollo[tarea]["fecha inicio"] = hoy.strftime("%d-%m-%Y")
+                guardar_datos_arch("tareasEnDesarrollo.json", enDesarrollo)
+
+                #eliminar de tareas sin asignar
+                tareas.pop(tarea)
+                guardar_datos_arch("tareas.json", tareas)
+                return tarea
+    return int(-1)           
+
 #accion para registrar ausencia
 class ActionFaltar(Action):
 
@@ -42,6 +133,8 @@ class ActionFaltar(Action):
 
         MAX_FALTAS = 6
 
+        respuestas = {"problematico": "Recorda tener una buena actitud y un trabajo ordenado cuando regreses!", "irresponsable": "Recorda que faltar mucho al trabajo puede afectar tu desempenio y tener consecuencias graves.", "quejoso": ":)", "normal": ":)"}
+
         a_file = open("employees.json", "r")
         json_object = json.load(a_file)
         a_file.close()
@@ -52,15 +145,17 @@ class ActionFaltar(Action):
             motivo = str(tracker.latest_message["text"])
             try:
                 employee = json_object[str(tracker.get_slot("documento"))]
+                actitud = definir_actitud(tracker.get_slot("documento"))
+
             except:
                 dispatcher.utter_message(text="Perdon, no tenemos ese ID en nuestra base de datos.")
                 return[]
             cantidad_ausencias = len(employee["ausencias"]) + 1
             if (cantidad_ausencias > MAX_FALTAS):
-                msg = "Registramos correctamente tu ausencia, en total faltaste " + str(cantidad_ausencias) + " dias, eso excede el limite de la empresa. Un empleado de Recursos Humanos estara en contacto contigo."
+                msg = "Registramos correctamente tu ausencia, en total faltaste " + str(cantidad_ausencias) + " dias, eso excede el limite de la empresa. Un empleado de Recursos Humanos estara en contacto contigo. " + respuestas[actitud]
                 dispatcher.utter_message(text=msg)
             else: 
-                msg = "Registramos correctamente tu ausencia, en total faltaste " + str(cantidad_ausencias) + " dias."
+                msg = "Registramos correctamente tu ausencia, en total faltaste " + str(cantidad_ausencias) + " dias. " +  respuestas[actitud]
                 dispatcher.utter_message(text=msg)
             hoy = date.today()
             d1 = hoy.strftime("%d-%m-%Y")
@@ -164,36 +259,74 @@ class ActionDias(Action):
 
             MAX_DAYS = 20
 
-            a_file = open("employees.json", "r")
-            json_object = json.load(a_file)
-            a_file.close()
+            empleados = obtener_datos_arch("employees.json")
+            tareasEnDesarrollo = obtener_datos_arch("tareasEnDesarrollo.json")
 
-            id = str(tracker.get_slot('documento'))
-            try:
-                user_info = json_object[id]
-            except:
-                dispatcher.utter_message(text="Perdon ese ID no existe en mi base de datos\n\n")
-                return[]
-            tarea = int(tracker.get_slot('tarea'))
-            for job in json_object[id]["tareas"]:
-                if (job["id"] == tarea):
-                    current_days = job["dias asignados"]
-                    new_days = int(tracker.get_slot('dias'))
-                    if (current_days + new_days <= MAX_DAYS ):
-                        msg = "Genial, se te asignaron" + str(new_days) + " dias mas para tu tarea de ID " + str(tarea)
-                        dispatcher.utter_message(text=msg)
-                        dispatcher.utter_message(text="Con que mas te puedo ayudar?")
-                        job["dias asignados"] = new_days + current_days
+            idEmpleado = tracker.get_slot("documento")
+            idTarea = empleados[str(idEmpleado)]["tarea"]
 
-                        a_file = open("employees.json", "w")
-                        json.dump(json_object, a_file)
-                        a_file.close()
+            diasAdicionales = tracker.get_slot("dias")
 
-                        return[]
+            if (idTarea == -1):
+                dispatcher.utter_message(text="Parece que todavia no tenes ninguna tarea asignada. Si queres, me podes pedir que te asigne una.")
+                return []
+            else:
+                tarea = tareasEnDesarrollo[str(idTarea)]
+                dias = tarea["dias asignados"]
+                if (int(dias) + int(diasAdicionales) > MAX_DAYS):
+                    if (int(dias) == MAX_DAYS):
+                        msg = "No puedo asignarte mas dias, tu tarea ya tiene el maximo de dias extras."
                     else:
-                        msg = "Perdon, no puedo asignarle " + str(new_days) + " a esa area, excede el limite de la empresa. Puedo asignarle un maximo de " + str(MAX_DAYS - current_days) + " dias."
-                        dispatcher.utter_message(text=msg)
-                        return[]
-                dispatcher.utter_message(text="Perdon, no puedo encontrar esa tarea. Por favor checkea que sea correcto o proba con otro ID.")    
-                return[]
+                        msg = "No puedo asignarte " + str(diasAdicionales) + "extra, se pasa del limite de la empresa. Como maximo te puedo dar " + str(MAX_DAYS - int(dias)) + "dias mas."
+                else:
+                    msg = "Perfecto, se te asignaron " + str(diasAdicionales) + " dias extra."
+                    tareasEnDesarrollo[str(idTarea)]["dias asignados"] = int(dias) + int(diasAdicionales)
+                    guardar_datos_arch("tareasEnDesarrollo.json", tareasEnDesarrollo)
+                dispatcher.utter_message(text=msg)
             return []
+
+class ActionPedirTarea(Action):
+
+    def name(self) -> Text:
+        return "action_pedir_tarea"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+            empleados = obtener_datos_arch("employees.json")
+            tareas = obtener_datos_arch("tareasEnDesarrollo.json")
+            idEmpleado = tracker.get_slot("documento")
+            if (empleados[idEmpleado]["tarea"] > 0):
+                idTarea = empleados[idEmpleado]["tarea"]
+                msg = "Parece que ya tenes una tarea sin terminar, la de " + tareas[str(idTarea)]["nombre"] + " del proyecto " + tareas[str(idTarea)]["proyecto"]
+                dispatcher.utter_message(text=msg)
+            else:
+                tareaAsignada = asignar_tarea(idEmpleado)
+                if tareaAsignada != -1 :
+                    msg = "Encontre una tarea para vos, la de " + tareas[str(tareaAsignada)]["nombre"] + " del proyecto " + tareas[str(tareaAsignada)]["proyecto"]
+                    dispatcher.utter_message(text=msg)
+                else:
+                    dispatcher.utter_message("Ufa, parece que tenemos ninguna tarea para vos en este momento :(")
+            return[]
+
+class ActionFinalizarTarea(Action):
+
+    def name(self) -> Text:
+        return "action_finalizar_tarea"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+            empleados = obtener_datos_arch("employees.json")
+            idEmpleado = tracker.get_slot("documento")
+            idTarea = empleados[idEmpleado]["tarea"]
+            if (idTarea < 0):
+                msg = "Parece que no tenes ninguna tarea asignada todavia. Te recomiendo que me pidas que te asigne una."
+                dispatcher.utter_message(text=msg)
+            else:
+                borrar_tarea(idTarea)
+                dispatcher.utter_message("Ya di por finalizada tu tarea, si queres me podes pedir otra.")
+            return[]
+
